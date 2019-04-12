@@ -469,7 +469,12 @@ public class ExcelUtil {
 //	/**
 //	 *  
 //	 */
-	public static List<Language> importExcel(String fileName) {
+	public static List<Language> importExcel(String folderName, String fileN) {
+		String fileName = folderName + fileN;
+		if (fileN == null || !fileN.contains(".xls")) {
+			log.info("fileName:{} 不是excel，不解析", fileName);
+			return null;
+		}
 		log.info("导入解析开始，fileName:{}", fileName);
 		try {
 
@@ -504,9 +509,8 @@ public class ExcelUtil {
 				list.add(lan);
 			}
 			log.info("导入文件解析成功！");
-			String targetFileName = fileName.replace("xls", "xml");
 
-			genenrateXml(list, targetFileName);
+			genenrateXml(list, folderName + fileName.split("\\.")[1] + "/", "net_errors.xml");
 			return list;
 		} catch (Exception e) {
 			log.info("导入文件解析失败！");
@@ -521,15 +525,15 @@ public class ExcelUtil {
 	 * @param list
 	 * @param fileName 目标文件名称
 	 */
-	public static void genenrateXml(List<Language> list, String fileName) {
+	public static void genenrateXml(List<Language> list, String folderName, String fileN) {
 		if (list == null || list.size() == 0)
 			return;
 		try {
 
-			log.info("开始生成xml！");
+			String fileName = folderName + fileN;
+			log.info("开始生成xml！fileName:{}", fileName);
 			File file = new File(fileName);
-			if (!file.exists())
-				file.createNewFile();
+			createFile(file);
 
 			FileOutputStream out = new FileOutputStream(file, true);
 			StringBuffer topHead = new StringBuffer();
@@ -566,6 +570,17 @@ public class ExcelUtil {
 		}
 	}
 
+	private static void createFile(File file) throws IOException {
+		if (file == null)
+			return;
+		if (!file.getParentFile().exists()) {
+			file.getParentFile().mkdirs();
+		}
+		if (file.exists())
+			file.delete();
+		file.createNewFile();
+	}
+
 	// 测试导入
 	public static void main(String[] args) {
 //		testQiqi();
@@ -577,7 +592,7 @@ public class ExcelUtil {
 	 * 根据 excel生成xml用于 语言
 	 */
 	public static void generateLanguageXml() {
-		importExcel("C:/Users/chengaoyang/Desktop/zh.xls");
+		importExcel("C:/Users/chengaoyang/Desktop/", "zh.xls");
 	}
 
 	/**
@@ -590,7 +605,7 @@ public class ExcelUtil {
 			String[] xlsFiles = file.list();
 			if (xlsFiles != null && xlsFiles.length > 0) {
 				for (String fileName : xlsFiles) {
-					importExcel(folderName + fileName);
+					importExcel(folderName, fileName);
 				}
 			}
 		}
