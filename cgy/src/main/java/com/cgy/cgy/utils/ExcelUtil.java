@@ -5,6 +5,7 @@ import static org.apache.poi.ss.usermodel.CellType.ERROR;
 import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
 import static org.apache.poi.ss.usermodel.CellType.STRING;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -56,6 +57,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.util.CellReference;
 
+import com.cgy.cgy.beans.Language;
 import com.cgy.cgy.beans.Resident;
 import com.microsoft.schemas.office.visio.x2012.main.CellType;
 
@@ -274,42 +276,6 @@ public class ExcelUtil {
 		System.out.println("------------------end create excel-------------------------------");
 	}
 
-	public static void exportTemplate() throws IOException {
-		// 声明一个工作薄
-		HSSFWorkbook workbook = new HSSFWorkbook();
-		// 创建一个Excel表单,参数为sheet的名字
-		HSSFSheet sheet = workbook.createSheet("模板表");
-		// 创建表头
-		setTitle(workbook, sheet);
-//		List<Map<String, Object>> oalist = budgetAdjustService.getOainform(oaId);
-//		// 新增数据行，并且设置单元格数据
-//		HSSFRow hssfRow = sheet.createRow(1);
-//		for (Map map : oalist) {
-//			hssfRow.createCell(0).setCellValue(map.get("adjustType") + "");
-//			hssfRow.createCell(1).setCellValue(map.get("applyDate") + "");
-//			hssfRow.createCell(2).setCellValue(map.get("processCode") + "");
-//			hssfRow.createCell(3).setCellValue(map.get("applyOrganization") + "");
-//			hssfRow.createCell(4).setCellValue(map.get("applyDepartment") + "");
-//			hssfRow.createCell(5).setCellValue(map.get("flag") + "");
-//		}
-//		hssfRow.createCell(6).setCellValue(adjOrg);
-//		hssfRow.createCell(7).setCellValue(adjDepart);
-//		hssfRow.createCell(8).setCellValue(adjSubject);
-
-		// SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-//		String fileName = "Template -" + new Date().getTime() + ".xls";
-//		// 清空response
-//		response.reset();
-//		// 设置response的Header
-//		response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
-//		OutputStream os = new BufferedOutputStream(response.getOutputStream());
-//		response.setContentType("application/vnd.ms-excel;charset=gb2312");
-//		// 将excel写入到输出流中
-//		workbook.write(os);
-//		os.flush();
-//		os.close();
-	}
-
 	// 创建表头
 	private static void setTitle(HSSFWorkbook workbook, HSSFSheet sheet) {
 		HSSFRow row = sheet.createRow(0);
@@ -501,54 +467,137 @@ public class ExcelUtil {
 	}
 
 //	/**
-//	 * 方法名：importExcel 功能：导入 描述： 创建人：typ 创建时间：2018/10/19 11:45 修改人： 修改描述： 修改时间：
+//	 *  
 //	 */
-//	public static List<Object[]> importExcel(String fileName) {
-//		log.info("导入解析开始，fileName:{}", fileName);
-//		try {
-//			List<Object[]> list = new ArrayList<>();
-//			InputStream inputStream = new FileInputStream(fileName);
-//			Workbook workbook = WorkbookFactory.create(inputStream);
-//			Sheet sheet = workbook.getSheetAt(0);
-//			// 获取sheet的行数
-//			int rows = sheet.getPhysicalNumberOfRows();
-//			for (int i = 0; i < rows; i++) {
-//				// 过滤表头行
+	public static List<Language> importExcel(String fileName) {
+		log.info("导入解析开始，fileName:{}", fileName);
+		try {
+
+			List<Language> list = new ArrayList<>();
+			InputStream inputStream = new FileInputStream(fileName);
+			Workbook workbook = WorkbookFactory.create(inputStream);
+			Sheet sheet = workbook.getSheetAt(0);
+			// 获取sheet的行数
+			int rows = sheet.getPhysicalNumberOfRows();
+			for (int i = 0; i < rows; i++) {
+				// 过滤表头行
 //				if (i == 0) {
 //					continue;
 //				}
-//				// 获取当前行的数据
-//				Row row = sheet.getRow(i);
-//				Object[] objects = new Object[row.getPhysicalNumberOfCells()];
-//				int index = 0;
-//				for (Cell cell : row) {
-//					if (cell.getCellType().equals(NUMERIC)) {
-//						objects[index] = (int) cell.getNumericCellValue();
-//					}
-//					if (cell.getCellType().equals(STRING)) {
-//						objects[index] = cell.getStringCellValue();
-//					}
-//					if (cell.getCellType().equals(BOOLEAN)) {
-//						objects[index] = cell.getBooleanCellValue();
-//					}
-//					if (cell.getCellType().equals(ERROR)) {
-//						objects[index] = cell.getErrorCellValue();
-//					}
-//					index++;
-//				}
-//				list.add(objects);
-//			}
-//			log.info("导入文件解析成功！");
-//			return list;
-//		} catch (Exception e) {
-//			log.info("导入文件解析失败！");
-//			e.printStackTrace();
-//		}
-//		return null;
-//	}
+				// 获取当前行的数据
+				Row row = sheet.getRow(i);
+				Language lan = new Language();
+
+				for (Cell cell : row) {
+					int column = cell.getColumnIndex();
+					String cellText = cell.getRichStringCellValue().getString();
+					if (cellText == null || cellText.length() == 0) {
+						throw new NullPointerException("cell is null!");
+					}
+
+					if (column == 0) {
+						lan.key = cellText;
+					} else {
+						lan.content = cellText;
+					}
+				}
+				list.add(lan);
+			}
+			log.info("导入文件解析成功！");
+			String targetFileName = fileName.replace("xls", "xml");
+
+			genenrateXml(list, targetFileName);
+			return list;
+		} catch (Exception e) {
+			log.info("导入文件解析失败！");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 生成 语言xml
+	 * 
+	 * @param list
+	 * @param fileName 目标文件名称
+	 */
+	public static void genenrateXml(List<Language> list, String fileName) {
+		if (list == null || list.size() == 0)
+			return;
+		try {
+
+			log.info("开始生成xml！");
+			File file = new File(fileName);
+			if (!file.exists())
+				file.createNewFile();
+
+			FileOutputStream out = new FileOutputStream(file, true);
+			StringBuffer topHead = new StringBuffer();
+			topHead.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n"
+					+ "<resources>\n    <string-array name=\"net_error_code\">\n");
+			out.write(topHead.toString().getBytes("utf-8"));
+
+			int size = list.size();
+			for (int i = 0; i < size; i++) {
+				StringBuffer key = new StringBuffer();
+				key.append("        <item>" + list.get(i).key + "</item>\n");
+				out.write(key.toString().getBytes("utf-8"));
+			}
+			StringBuffer center = new StringBuffer();
+			center.append("    </string-array>\r\n" + "    <string-array name=\"net_error_content\">\n");
+			out.write(center.toString().getBytes("utf-8"));
+
+			for (int i = 0; i < size; i++) {
+				StringBuffer content = new StringBuffer();
+				content.append("        <item>" + list.get(i).content + "</item>\n");
+				out.write(content.toString().getBytes("utf-8"));
+			}
+
+			StringBuffer bottom = new StringBuffer();
+			bottom.append("    </string-array>\r\n" + "</resources>");
+			out.write(bottom.toString().getBytes("utf-8"));
+
+			out.close();
+
+			log.info("生成xml成功！");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	// 测试导入
 	public static void main(String[] args) {
+//		testQiqi();
+//		generateLanguageXml();
+		batchGenerateLanguageXml();
+	}
+
+	/**
+	 * 根据 excel生成xml用于 语言
+	 */
+	public static void generateLanguageXml() {
+		importExcel("C:/Users/chengaoyang/Desktop/zh.xls");
+	}
+
+	/**
+	 * 批量生成
+	 */
+	public static void batchGenerateLanguageXml() {
+		String folderName = "C:/Users/chengaoyang/Desktop/lan/";
+		File file = new File(folderName);
+		if (file != null && file.isDirectory()) {
+			String[] xlsFiles = file.list();
+			if (xlsFiles != null && xlsFiles.length > 0) {
+				for (String fileName : xlsFiles) {
+					importExcel(folderName + fileName);
+				}
+			}
+		}
+
+	}
+
+	public static void testQiqi() {
 //		System.out.println(getAgeFromIdNum("320624197201155325"  ));
 		try {
 			HashMap<String, HashMap<String, Resident>> all = readExcel("C:/Users/chengaoyang/Desktop/qiqi/户口本最新.xls");
@@ -590,4 +639,40 @@ public class ExcelUtil {
 //	break;
 //default:
 //	System.out.println("default-->" + cell.getCellType());
+//}
+
+//public static void exportTemplate() throws IOException {
+//	// 声明一个工作薄
+//	HSSFWorkbook workbook = new HSSFWorkbook();
+//	// 创建一个Excel表单,参数为sheet的名字
+//	HSSFSheet sheet = workbook.createSheet("模板表");
+//	// 创建表头
+//	setTitle(workbook, sheet);
+//	List<Map<String, Object>> oalist = budgetAdjustService.getOainform(oaId);
+//	// 新增数据行，并且设置单元格数据
+//	HSSFRow hssfRow = sheet.createRow(1);
+//	for (Map map : oalist) {
+//		hssfRow.createCell(0).setCellValue(map.get("adjustType") + "");
+//		hssfRow.createCell(1).setCellValue(map.get("applyDate") + "");
+//		hssfRow.createCell(2).setCellValue(map.get("processCode") + "");
+//		hssfRow.createCell(3).setCellValue(map.get("applyOrganization") + "");
+//		hssfRow.createCell(4).setCellValue(map.get("applyDepartment") + "");
+//		hssfRow.createCell(5).setCellValue(map.get("flag") + "");
+//	}
+//	hssfRow.createCell(6).setCellValue(adjOrg);
+//	hssfRow.createCell(7).setCellValue(adjDepart);
+//	hssfRow.createCell(8).setCellValue(adjSubject);
+
+// SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+//	String fileName = "Template -" + new Date().getTime() + ".xls";
+//	// 清空response
+//	response.reset();
+//	// 设置response的Header
+//	response.addHeader("Content-Disposition", "attachment;filename=" + fileName);
+//	OutputStream os = new BufferedOutputStream(response.getOutputStream());
+//	response.setContentType("application/vnd.ms-excel;charset=gb2312");
+//	// 将excel写入到输出流中
+//	workbook.write(os);
+//	os.flush();
+//	os.close();
 //}
