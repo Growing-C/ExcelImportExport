@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([[4],{RXBc:function(e,n,t){"use strict";var o=t("g09b");Object.defineProperty(n,"__esModule",{value:!0}),n.default=void 0;var u=o(t("q1tI")),d=o(t("usdK"));class a extends u.default.PureComponent{componentDidMount(){d.default.replace("/home")}render(){return null}}var r=a;n.default=r}}]);

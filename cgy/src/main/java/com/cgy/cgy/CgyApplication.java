@@ -8,6 +8,6 @@ public class CgyApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CgyApplication.class, args);
-		System.out.println("test");
+		System.out.println("start OK!");
 	}
 }
