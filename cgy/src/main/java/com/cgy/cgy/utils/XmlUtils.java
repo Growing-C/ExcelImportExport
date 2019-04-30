@@ -194,8 +194,17 @@ public class XmlUtils {
 
 	// 测试导入
 	public static void main(String[] args) {
-		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/strings.xml"),
-				"C:/Users/chengaoyang/Desktop/lan/strings.xls");
+//		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/strings.xml"),
+//				"C:/Users/chengaoyang/Desktop/lan/strings.xls");
+
+//		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/zh/strings.xml"),
+//				"C:/Users/chengaoyang/Desktop/lan/basic/zh/strings.xls");
+
+		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/ja/strings.xml"),
+				"C:/Users/chengaoyang/Desktop/lan/basic/ja/strings.xls");
+
+		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/en/strings.xml"),
+				"C:/Users/chengaoyang/Desktop/lan/basic/en/strings.xls");
 	}
 
 }

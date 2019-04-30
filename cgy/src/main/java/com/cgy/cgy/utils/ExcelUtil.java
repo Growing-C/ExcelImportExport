@@ -486,9 +486,9 @@ public class ExcelUtil {
 			int rows = sheet.getPhysicalNumberOfRows();
 			for (int i = 0; i < rows; i++) {
 				// 过滤表头行
-//				if (i == 0) {
-//					continue;
-//				}
+				if (i == 0) {
+					continue;
+				}
 				// 获取当前行的数据
 				Row row = sheet.getRow(i);
 				Language lan = new Language();
@@ -510,7 +510,7 @@ public class ExcelUtil {
 			}
 			log.info("导入文件解析成功！");
 
-			genenrateXml(list, folderName + fileName.split("\\.")[1] + "/", "net_errors.xml");
+//			genenrateXml(list, folderName + fileName.split("\\.")[1] + "/", "net_errors.xml");
 			return list;
 		} catch (Exception e) {
 			log.info("导入文件解析失败！");
@@ -570,7 +570,7 @@ public class ExcelUtil {
 		}
 	}
 
-	private static void createFile(File file) throws IOException {
+	public static void createFile(File file) throws IOException {
 		if (file == null)
 			return;
 		if (!file.getParentFile().exists()) {

@@ -12,10 +12,13 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Balance;
 import com.stripe.model.Card;
 import com.stripe.model.Charge;
+import com.stripe.model.ChargeCollection;
 import com.stripe.model.Customer;
+import com.stripe.model.EphemeralKey;
 import com.stripe.model.PaymentSource;
 import com.stripe.model.Token;
 import com.stripe.net.RequestOptions;
+import com.stripe.param.EphemeralKeyCreateParams;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,10 +26,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class StripeService {
 	// Test mode secret keys have the prefix sk_test_
+	// 客户端用 pk_test 后端用 sk_test
 //	private final String STRIP_API_KEY = "pk_test_sxgqTrwz5alXy47e9YBkJMm5000wQJsBtw";
 	private final String STRIP_API_KEY = "sk_test_0oamHqJqUkai2LqEGL8T1yo700RB7LLmi1";
 
-	// 给每个请求通过setIdempotencyKey()加上key 防止重复请求
+	// 可以给每个请求通过setIdempotencyKey()加上key 防止重复请求（24小时过期）
 	private final String idempotencyKey = UUID.fromString("146bbe6b-fffd-408a-8159-6d60d0d26c01").toString();
 	RequestOptions options;// 请求配置
 
@@ -39,7 +43,7 @@ public class StripeService {
 		// production
 		// See your keys here: https://dashboard.stripe.com/account/apikeys
 		Stripe.apiKey = STRIP_API_KEY;
-		options = RequestOptions.builder().setIdempotencyKey("zzGnCsyZ2u1xfiW1").build();
+		options = RequestOptions.builder().build();
 		log.info("Stripe API_VERSION {}", Stripe.API_VERSION);
 		log.info("set stripe api key {}", Stripe.apiKey);
 	}
@@ -115,14 +119,15 @@ public class StripeService {
 	 * 
 	 * @throws StripeException
 	 */
-	public void addCreditCard(String customerId, String tok_mastercard) throws StripeException {
+	public Card addCreditCard(String customerId, String tok_mastercard) throws StripeException {
 		Customer customer = Customer.retrieve(customerId);
 		log.info("addCreditCard customer: {}", customer.getName());
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("source", tok_mastercard);
-		PaymentSource source = customer.getSources().create(params);
+		Card source = (Card) customer.getSources().create(params);
 		log.info("addCreditCard PaymentSource: {}", source.toString());
+		return source;
 	}
 
 //	创建token，此操作应该放在app端，如果在backend中调用了，就无法使用stripe的radar（一个人工智能的防诈骗api）
@@ -154,13 +159,15 @@ public class StripeService {
 	public List<PaymentSource> listAllCards(String customerId) throws StripeException {
 
 		Map<String, Object> cardParams = new HashMap<String, Object>();
-		cardParams.put("limit", 3);
-		cardParams.put("object", "card");
+		cardParams.put("limit", 5);
+//		cardParams.put("object", "card");//前端paymentMethodsActivity添加的卡似乎不属于card，用这个会查不到
 		List<PaymentSource> cards = Customer.retrieve(customerId).getSources().list(cardParams).getData();
 
 		log.info("listAllCards cards size : {}", cards == null ? null : cards.size());
-		if (cards != null && cards.size() > 0) {
-			log.info("\nlistAllCards cards 0 info : {}", cards.get(0).toString());
+		if (cards != null) {
+			for (PaymentSource card : cards) {
+				log.info("\nlistAllCards card id : {}", card.getId());
+			}
 		}
 		return cards;
 //		Card source = (Card) customer.getSources().retrieve(card_1EU6pK2eZvKYlo2CDrsnPJ7J);
@@ -191,6 +198,65 @@ public class StripeService {
 		Customer customer = Customer.retrieve(customerId);
 		Card card = (Card) customer.getSources().retrieve(cardId);
 		card.delete();
+	}
+
+	/**
+	 * 发起支付
+	 * 
+	 * @param customerId The ID of an existing customer that will be charged in this
+	 *                   request.
+	 * @param source     A payment source to be charged. This can be the ID of a
+	 *                   card (i.e., credit or debit card), a bank account, a
+	 *                   source, a token, or a connected account. For certain
+	 *                   sources—namely, cards, bank accounts, and attached
+	 *                   sources—you must also pass the ID of the associated
+	 *                   customer.
+	 * @param amount     A positive integer representing how much to charge in the
+	 *                   smallest currency unit ，人民币似乎必须是整数(此处似乎最少500)
+	 * @throws StripeException
+	 */
+	public Charge charge(String customerId, String source, int amount) throws StripeException {
+		Map<String, Object> chargeParams = new HashMap<String, Object>();
+		chargeParams.put("amount", amount);// 2000
+		chargeParams.put("currency", "CNY");// usd
+		chargeParams.put("description", "Charge for jenny.rosen@example.com");
+		chargeParams.put("source", source);
+		chargeParams.put("customer", customerId);
+//		chargeParams.put("capture", true);// 必须capture才会真正的 完成交易 不然7天后会自动退款,默认是true
+		// ^ obtained with Stripe.js
+		Charge charge = Charge.create(chargeParams);
+		log.info("\ncharge : {}", charge.toString());
+		return charge;
+	}
+
+	/**
+	 * @param customerId Only return charges for the customer specified by this
+	 *                   customer ID.
+	 * @throws StripeException
+	 */
+	public ChargeCollection listCharges(String customerId) throws StripeException {
+		Map<String, Object> chargeParams = new HashMap<String, Object>();
+		chargeParams.put("limit", "3");
+		chargeParams.put("customer", customerId);
+
+		ChargeCollection chargeCollection = Charge.list(chargeParams);
+		List<Charge> charges = chargeCollection.getData();
+		if (charges != null) {
+			for (Charge cha : charges) {
+				log.info("\nlistCharges charge amount : {}", cha.getAmount());
+			}
+		}
+
+		return chargeCollection;
+	}
+
+	public EphemeralKey createEphemeralKey(String customerId, String stripeVersion) throws Exception {
+		RequestOptions op = RequestOptions.builder() 
+				.setStripeVersionOverride(stripeVersion).build();
+		EphemeralKeyCreateParams params = EphemeralKeyCreateParams.builder().setCustomer(customerId).build();
+		EphemeralKey key = EphemeralKey.create(params, op);
+		log.info("\ncreateEphemeralKey id: {}", key.getId());
+		return key;
 	}
 }
 

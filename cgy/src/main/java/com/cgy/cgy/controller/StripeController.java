@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cgy.cgy.service.StripeService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Card;
+import com.stripe.model.Charge;
+import com.stripe.model.ChargeCollection;
 import com.stripe.model.Customer;
+import com.stripe.model.EphemeralKey;
 import com.stripe.model.PaymentSource;
 import com.stripe.model.Token;
 
@@ -30,7 +33,8 @@ public class StripeController {
 			mStripeService.listCustomers();
 
 			Customer customer = mStripeService.findOrCreateCustomer(customerId);
-			return String.format("createCustomer success !  name :%s", customer.getName());
+//			return String.format("createCustomer success !  name :%s", customer.getName());
+			return customer.toJson();
 		} catch (StripeException e) {
 			e.printStackTrace();
 			return "Error:" + e.getMessage();
@@ -46,13 +50,15 @@ public class StripeController {
 		}
 		try {
 			Customer customer = mStripeService.updateCustomer(customerId, null);
-			return String.format("UpdateCustomer success !  name :%s", customer.getName());
+//			return String.format("UpdateCustomer success !  name :%s", customer.getName());
+			return customer.toJson();
 		} catch (StripeException e) {
 			e.printStackTrace();
 			return "Error:" + e.getMessage();
 		}
 	}
 
+	//所有测试数据 见  https://stripe.com/docs/testing
 	// 可用token:tok_1EU9t3C6kLRXXaxJtGC8Brjy
 	// http://localhost:8181/stripe/customer/addCard?customerId=cus_Ey39ZcB7ww7vWV&token=tok_1EU9t3C6kLRXXaxJtGC8Brjy
 	@RequestMapping("/stripe/customer/addCard")
@@ -66,8 +72,8 @@ public class StripeController {
 		}
 
 		try {
-			mStripeService.addCreditCard(customerId, cardToken);
-			return "addCreditCard succeed";
+			Card card = mStripeService.addCreditCard(customerId, cardToken);
+			return card.toJson();
 		} catch (StripeException e) {
 			e.printStackTrace();
 			return "Error:" + e.getMessage();
@@ -116,7 +122,8 @@ public class StripeController {
 		}
 	}
 
-	//可用的测试卡号 4242424242424242 4000056655665556  5555555555554444
+	// 可用的测试卡号 4242424242424242 4000056655665556 5555555555554444 371449635398431
+	//真卡 4477570005382005 6210676802084484923
 	// http://localhost:8181/stripe/customer/createToken?cardNum=4000056655665556
 	@RequestMapping("/stripe/customer/createToken")
 	public String testCreateToken(@RequestParam("cardNum") String cardNum) {
@@ -127,8 +134,71 @@ public class StripeController {
 			Token token = mStripeService.testCreateToken(cardNum);
 			log.info("createToken token id {}", token.getId());
 			mStripeService.retreiveToken(token.getId());
-			return token.toString();
+			return token.toJson();
 		} catch (StripeException e) {
+			e.printStackTrace();
+			return "Error:" + e.getMessage();
+		}
+	}
+
+	// http://localhost:8181/stripe/customer/charge?customerId=cus_Ey39ZcB7ww7vWV&source=card_1EU9t3C6kLRXXaxJv6pDO2jF&amount=10
+	@RequestMapping("/stripe/customer/charge")
+	public String charge(@RequestParam("customerId") String customerId, @RequestParam("source") String source,
+			@RequestParam("amount") int amount) {
+		if (customerId == null || customerId.length() == 0) {
+			return String.format("Error: customerId is null");
+		}
+		if (source == null || source.length() == 0) {
+			return String.format("Error: source is null");
+		}
+		if (amount <= 0) {
+			return String.format("Error: amount is not valid");
+		}
+		try {
+			Charge charge = mStripeService.charge(customerId, source, amount);
+//			return String.format("charge succeed currency: %s source id :%s", charge.getCurrency(),
+//					charge.getSource().getId());
+			return charge.toJson();
+		} catch (StripeException e) {
+			e.printStackTrace();
+			return "Error:" + e.getMessage();
+		}
+	}
+
+	// http://localhost:8181/stripe/customer/listCharges?customerId=cus_Ey39ZcB7ww7vWV
+	@RequestMapping("/stripe/customer/listCharges")
+	public String listCharges(@RequestParam("customerId") String customerId) {
+		if (customerId == null || customerId.length() == 0) {
+			return String.format("Error: customerId is null");
+		}
+
+		try {
+			ChargeCollection chargeCollection = mStripeService.listCharges(customerId);
+//			return String.format("charges size %s", charges == null ? 0 : charges.size());
+			return chargeCollection.toJson();
+		} catch (StripeException e) {
+			e.printStackTrace();
+			return "Error:" + e.getMessage();
+		}
+	}
+
+	// http://192.168.34.19:8181/stripe/customer/createEphemeralKey?customerId=cus_Ey39ZcB7ww7vWV&version=2017-06-05
+	// http://localhost:8181/stripe/customer/createEphemeralKey?customerId=cus_Ey39ZcB7ww7vWV&version=2017-06-05
+	@RequestMapping("/stripe/customer/createEphemeralKey")
+	public String createEphemeralKey(@RequestParam("customerId") String customerId,
+			@RequestParam("version") String version) {
+		if (version == null || version.length() == 0) {
+			return String.format("Error: version is null");
+		}
+		log.info("version is {}",version);
+		if (customerId == null || customerId.length() == 0) {
+//			return String.format("Error: customerId is null");
+			customerId = "cus_Ey39ZcB7ww7vWV";// TODO:此id待决定 是否是前端传，后台其实可以根据帐号获取到id
+		}
+		try {
+			EphemeralKey key = mStripeService.createEphemeralKey(customerId, version);
+			return key.toJson();
+		} catch (Exception e) {
 			e.printStackTrace();
 			return "Error:" + e.getMessage();
 		}
