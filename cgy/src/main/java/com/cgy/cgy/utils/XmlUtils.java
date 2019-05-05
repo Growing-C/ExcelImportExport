@@ -40,7 +40,7 @@ public class XmlUtils {
 	public static Map<String, String> readXml(String filePath) {
 		File file = new File(filePath);
 		if (!file.exists() || filePath == null || filePath.contains("\\.xml")) {
-			log.info("fileName:{} 不存在！", filePath);
+			log.info("readXml fileName:{} 不存在！", filePath);
 			return null;
 		}
 
@@ -55,7 +55,7 @@ public class XmlUtils {
 			// 获取根节点
 			Element rootElt = doc.getRootElement();
 			// 拿到根节点的名称
-			System.out.println("根节点：" + rootElt.getName());
+			System.out.println("readXml 根节点：" + rootElt.getName());
 
 			// 获取根节点下的子节点head
 			Iterator iter = rootElt.elementIterator("string");
@@ -74,7 +74,7 @@ public class XmlUtils {
 //				System.out.println("key:" + key + "   String value:" + value);
 			}
 
-			log.info(" map大小为 {}！", map.size());
+			log.info("readXml map大小为 {}！", map.size());
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -83,12 +83,13 @@ public class XmlUtils {
 		return map;
 	}
 
-	public static void generateExcel(Map<String, String> map, String fileName) {
+	public static String generateExcel(Map<String, String> map, String fileName) {
 		if (map == null || map.size() == 0) {
 			log.info("map is null");
-			return;
+			return null;
 		}
 		System.out.println("------------------start create excel-------------------------------");
+		File file = null;
 //		Workbook[] wbs = new Workbook[] { new HSSFWorkbook(), new XSSFWorkbook() };
 		Workbook[] wbs = new Workbook[] { new XSSFWorkbook() };
 		for (int i = 0; i < wbs.length; i++) {
@@ -164,7 +165,7 @@ public class XmlUtils {
 			if (workbook instanceof XSSFWorkbook) {
 				filename = filename + "x";
 			}
-			File file = new File(filename);
+			file = new File(filename);
 			if (file.exists())
 				file.delete();
 
@@ -190,6 +191,7 @@ public class XmlUtils {
 
 		System.out.println("------------------end create excel-------------------------------");
 
+		return file == null ? null : file.getPath();
 	}
 
 	// 测试导入
@@ -200,11 +202,20 @@ public class XmlUtils {
 //		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/zh/strings.xml"),
 //				"C:/Users/chengaoyang/Desktop/lan/basic/zh/strings.xls");
 
-		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/ja/strings.xml"),
-				"C:/Users/chengaoyang/Desktop/lan/basic/ja/strings.xls");
+//		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/ja/strings.xml"),
+//				"C:/Users/chengaoyang/Desktop/lan/basic/ja/strings.xls");
+//
+//		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/en/strings.xml"),
+//				"C:/Users/chengaoyang/Desktop/lan/basic/en/strings.xls");
 
-		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/basic/en/strings.xml"),
-				"C:/Users/chengaoyang/Desktop/lan/basic/en/strings.xls");
+		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/login/values/strings.xml"),
+				"C:/Users/chengaoyang/Desktop/lan/login/values/strings.xls");
+
+		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/login/values-ja-rJP/strings.xml"),
+				"C:/Users/chengaoyang/Desktop/lan/login/values-ja-rJP/strings.xls");
+
+		generateExcel(readXml("C:/Users/chengaoyang/Desktop/lan/login/values-zh-rCN/strings.xml"),
+				"C:/Users/chengaoyang/Desktop/lan/login/values-zh-rCN/strings.xls");
 	}
 
 }

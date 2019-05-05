@@ -475,7 +475,7 @@ public class ExcelUtil {
 			log.info("fileName:{} 不是excel，不解析", fileName);
 			return null;
 		}
-		log.info("导入解析开始，fileName:{}", fileName);
+		log.info("导入excel解析开始，fileName:{}", fileName);
 		try {
 
 			List<Language> list = new ArrayList<>();
