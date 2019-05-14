@@ -14,6 +14,7 @@ import com.stripe.model.Charge;
 import com.stripe.model.ChargeCollection;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
+import com.stripe.model.PaymentIntent;
 import com.stripe.model.PaymentSource;
 import com.stripe.model.Token;
 
@@ -58,7 +59,7 @@ public class StripeController {
 		}
 	}
 
-	//所有测试数据 见  https://stripe.com/docs/testing
+	// 所有测试数据 见 https://stripe.com/docs/testing
 	// 可用token:tok_1EU9t3C6kLRXXaxJtGC8Brjy
 	// http://localhost:8181/stripe/customer/addCard?customerId=cus_Ey39ZcB7ww7vWV&token=tok_1EU9t3C6kLRXXaxJtGC8Brjy
 	@RequestMapping("/stripe/customer/addCard")
@@ -123,7 +124,7 @@ public class StripeController {
 	}
 
 	// 可用的测试卡号 4242424242424242 4000056655665556 5555555555554444 371449635398431
-	//真卡 4477570005382005 6210676802084484923
+	// 真卡 4477570005382005 6210676802084484923
 	// http://localhost:8181/stripe/customer/createToken?cardNum=4000056655665556
 	@RequestMapping("/stripe/customer/createToken")
 	public String testCreateToken(@RequestParam("cardNum") String cardNum) {
@@ -190,7 +191,7 @@ public class StripeController {
 		if (version == null || version.length() == 0) {
 			return String.format("Error: version is null");
 		}
-		log.info("version is {}",version);
+		log.info("version is {}", version);
 		if (customerId == null || customerId.length() == 0) {
 //			return String.format("Error: customerId is null");
 			customerId = "cus_Ey39ZcB7ww7vWV";// TODO:此id待决定 是否是前端传，后台其实可以根据帐号获取到id
@@ -199,6 +200,28 @@ public class StripeController {
 			EphemeralKey key = mStripeService.createEphemeralKey(customerId, version);
 			return key.toJson();
 		} catch (Exception e) {
+			e.printStackTrace();
+			return "Error:" + e.getMessage();
+		}
+	}
+
+	// http://192.168.34.19:8181/stripe/customer/createPaymentIntentForAutoConfirm?currency=CNY&amount=501
+	// http://localhost:8181/stripe/customer/createPaymentIntentForAutoConfirm?currency=CNY&amount=501
+	@RequestMapping("/stripe/customer/createPaymentIntentForAutoConfirm")
+	public String createPaymentIntentForAutoConfirm(@RequestParam("currency") String currency,
+			@RequestParam("amount") int amount) {
+		if (currency == null || currency.length() == 0) {
+			return String.format("Error: currency is null");
+		}
+		if (amount <= 0) {
+			return String.format("Error: amount is not valid");
+		}
+		try {
+			PaymentIntent intent = mStripeService.createPaymentIntentForAutoConfirm(amount, currency);
+//			return String.format("charge succeed currency: %s source id :%s", charge.getCurrency(),
+//					charge.getSource().getId());
+			return intent.toJson();
+		} catch (StripeException e) {
 			e.printStackTrace();
 			return "Error:" + e.getMessage();
 		}

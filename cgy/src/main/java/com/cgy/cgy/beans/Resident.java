@@ -16,4 +16,8 @@ public class Resident {
 		return "<<<<" + name + "-" + address + "-" + contactPhone + "-" + mobile + "-" + residenceType + "-" + idNum
 				+ "-" + relationship + "-" + gender + "-" + residenceNum + ">>>>";
 	}
+//	身份证号(必填)	姓名　(必填)	性别	年龄	家庭地址	联系电话	家庭人口	所在区县(必填)	所在镇(街道)(必填)	所在村(必填)	所属户编号(必填)	与户主的关系(必填)	文化程度	人员状态
+//	320624193208035328	高红英	女	87	25组48号		5	通州区	刘桥镇	蒋一村	320624196411085332	之母亲		正常
+
+	public String age;
 }

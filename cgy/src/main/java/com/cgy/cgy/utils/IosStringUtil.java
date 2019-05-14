@@ -176,17 +176,19 @@ public class IosStringUtil {
 	// 测试导入
 	public static void main(String[] args) {
 //		System.out.println("fdsasdf.xml".contains(".xml"));
-//		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/login/");
+		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/");
+		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/");
 
-//		xml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/login/values/", "strings.xml");
+//		xml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/", "strings.xml");
+		
 //		generateIosFile("Unicode", "C:/Users/chengaoyang/Desktop/lan/login/values/Localizable.strings",
 //				ExcelUtil.importExcel("C:/Users/chengaoyang/Desktop/lan/login/values/", "strings.xlsx"));
 //
 //		generateIosFile("Unicode", "C:/Users/chengaoyang/Desktop/lan/login/values-ja-rJP/Localizable.strings",
 //				ExcelUtil.importExcel("C:/Users/chengaoyang/Desktop/lan/login/values-ja-rJP/", "strings.xlsx"));
 //
-		generateIosFile("Unicode", "C:/Users/chengaoyang/Desktop/lan/login/values-zh-rCN/Localizable.strings",
-				ExcelUtil.importExcel("C:/Users/chengaoyang/Desktop/lan/login/values-zh-rCN/", "strings.xlsx"));
+//		generateIosFile("Unicode", "C:/Users/chengaoyang/Desktop/lan/login/values-zh-rCN/Localizable.strings",
+//				ExcelUtil.importExcel("C:/Users/chengaoyang/Desktop/lan/login/values-zh-rCN/", "strings.xlsx"));
 //		String a = "adfdsaf\"f\"d";
 //		System.out.println(a);
 //		System.out.println(a.replace("\"", "\\\""));

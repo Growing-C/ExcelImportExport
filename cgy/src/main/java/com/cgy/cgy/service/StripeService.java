@@ -15,6 +15,7 @@ import com.stripe.model.Charge;
 import com.stripe.model.ChargeCollection;
 import com.stripe.model.Customer;
 import com.stripe.model.EphemeralKey;
+import com.stripe.model.PaymentIntent;
 import com.stripe.model.PaymentSource;
 import com.stripe.model.Token;
 import com.stripe.net.RequestOptions;
@@ -251,12 +252,44 @@ public class StripeService {
 	}
 
 	public EphemeralKey createEphemeralKey(String customerId, String stripeVersion) throws Exception {
-		RequestOptions op = RequestOptions.builder() 
-				.setStripeVersionOverride(stripeVersion).build();
+		RequestOptions op = RequestOptions.builder().setStripeVersionOverride(stripeVersion).build();
 		EphemeralKeyCreateParams params = EphemeralKeyCreateParams.builder().setCustomer(customerId).build();
 		EphemeralKey key = EphemeralKey.create(params, op);
 		log.info("\ncreateEphemeralKey id: {}", key.getId());
 		return key;
+	}
+
+	/**
+	 * AUTOMATIC CONFIRMATION Step
+	 * </p>
+	 * 1: Create a PaymentIntent on the server
+	 * 
+	 * We recommend creating a PaymentIntent as soon as the amount is known, such as
+	 * when the customer begins the checkout process.
+	 * 
+	 * Step 2: Pass the PaymentIntent’s client secret to the client
+	 * 
+	 * The PaymentIntent object contains a client secret, a unique key that you need
+	 * to pass to Stripe.js on the client side in order to create a charge.
+	 * 
+	 * Step 3: Collect payment method details on the client
+	 * 
+	 * Step 4: Submit the payment to Stripe from the client
+	 * 
+	 * Step 5: Asynchronously fulfill the customer’s order
+	 * 
+	 * @param amount
+	 * @param currentcy
+	 * @throws StripeException
+	 */
+	public PaymentIntent createPaymentIntentForAutoConfirm(int amount, String currency) throws StripeException {
+		Map<String, Object> paymentintentParams = new HashMap<String, Object>();
+		paymentintentParams.put("amount", amount);// amount可以通过update来更新
+		paymentintentParams.put("currency", currency);// usd CNY
+
+		PaymentIntent intent = PaymentIntent.create(paymentintentParams);
+		log.info("\n createPaymentIntentForAutoConfirm  : {}", intent.toJson());
+		return intent;
 	}
 }
 
