@@ -98,7 +98,7 @@ public class IosStringUtil {
 				StringBuffer key = new StringBuffer();
 				Language lan = lanList.get(i);
 				// ios 里面引号需要加斜杠
-				String line = "\"" + lan.key + "\" = \"" + lan.content.replace("\"", "\\\"") + "\";\n";
+				String line = "\"" + lan.key + "\" = \"" + lan.content.replace("\"", "\\\"").replace("%1s", "%@") + "\";\n";
 				if (lan.content.contains("\"")) {
 					System.out.println("line:" + line);
 				}
@@ -176,8 +176,9 @@ public class IosStringUtil {
 	// 测试导入
 	public static void main(String[] args) {
 //		System.out.println("fdsasdf.xml".contains(".xml"));
-		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/");
-		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/");
+//		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/");
+//		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/");
+		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/19-6-11/");
 
 //		xml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/", "strings.xml");
 		
