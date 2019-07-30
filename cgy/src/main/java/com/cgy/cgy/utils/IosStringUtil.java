@@ -71,7 +71,7 @@ public class IosStringUtil {
 		String iosFilePath = xmlFileDirectory + "Localizable.strings";
 		XmlUtils.generateExcel(XmlUtils.readXml(xmlFilePath), xmlFileDirectory + "strings.xls");
 
-		generateIosFile(charSet, iosFilePath, ExcelUtil.importExcel(xmlFileDirectory, "strings.xlsx"));
+		generateIosFile(charSet, iosFilePath, ExcelUtil.importExcelKeyValue(xmlFileDirectory, "strings.xlsx",1));
 
 		log.info("xml2IosString end！\n--------------------------------");
 
@@ -98,7 +98,7 @@ public class IosStringUtil {
 				StringBuffer key = new StringBuffer();
 				Language lan = lanList.get(i);
 				// ios 里面引号需要加斜杠
-				String line = "\"" + lan.key + "\" = \"" + lan.content.replace("\"", "\\\"").replace("%1s", "%@") + "\";\n";
+				String line = "\"" + lan.key + "\" = \"" + lan.content.replace("\"", "\\\"").replace("%1$s", "%@") + "\";\n";
 				if (lan.content.contains("\"")) {
 					System.out.println("line:" + line);
 				}
@@ -178,7 +178,8 @@ public class IosStringUtil {
 //		System.out.println("fdsasdf.xml".contains(".xml"));
 //		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/");
 //		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/");
-		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/19-6-11/");
+//		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/19-6-17/");
+		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/19-07-12/");
 
 //		xml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/", "strings.xml");
 		
