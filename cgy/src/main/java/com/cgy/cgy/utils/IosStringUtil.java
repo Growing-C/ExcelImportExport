@@ -179,7 +179,8 @@ public class IosStringUtil {
 //		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/");
 //		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/");
 //		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/19-6-17/");
-		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/19-07-12/");
+//		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/basic/19-07-12/");
+		batchXml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/yologo/");
 
 //		xml2IosString("Unicode", "C:/Users/chengaoyang/Desktop/lan/netconfig/", "strings.xml");
 		
