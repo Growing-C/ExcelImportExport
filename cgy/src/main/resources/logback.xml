@@ -4,7 +4,7 @@
 	<!-- 本地服务器属性定制 -->
   	<!-- <property file="/usr/local/bcl/conf/smartbuilding-server/smartbuilding-server.properties" /> -->
 
-  	<property name="LOG_HOME" value="${logging.path:-/usr/local/bcl/log/smartbuilding-server}" />
+  	<property name="LOG_HOME" value="${logging.path:-/myprojects/webworkspace/log/excel-server}" />
 	<!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
