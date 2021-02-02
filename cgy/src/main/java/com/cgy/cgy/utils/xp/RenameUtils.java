@@ -17,12 +17,12 @@ public class RenameUtils {
 //		replaceAll("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/导航地图最终版/resource/白天/车道线指示", "车道线指示navi_lane",
 //				"navi_lane");
 //		replaceAll("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/导航地图最终版/resource/白天/车道线指示", "_night", "");
-		replaceAll("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/转向图片仪表/白天指示-大", "png_ic_xlarge_Normal_ic_sou", "navi_maneuver_ic_");
+//		replaceAll("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/转向图片仪表/白天指示-大", "png_ic_xlarge_Normal_ic_sou", "navi_maneuver_ic_");
 
-//		compareFileNames("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/导航地图最终版/resource/白天/车道线指示",
-//				"C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/lane车道地图端");
-//		compareFileNames("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/lane车道地图端",
-//				"C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/导航地图最终版/resource/白天/车道线指示");
+		compareFileNames("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/导航地图最终版/resource/白天/车道线指示",
+				"C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/lane车道地图端");
+		compareFileNames("C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/lane车道地图端",
+				"C:/Users/Xpeng/Desktop/d55仪表ui/导航地图/resource/导航地图最终版/resource/白天/车道线指示");
 	}
 
 
